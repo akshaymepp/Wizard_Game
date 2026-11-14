@@ -341,7 +341,7 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
             } else if (bidding && state.bidTurnIndex == userIndex) {
                 LazyRow(Modifier.fillMaxWidth().height(36.dp), horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) { items(engine.legalBidsFor(userIndex)) { value -> Button(onClick = { engine.submitBid(userIndex, value); selectedCard = null; selectedHandIndex = -1; onChanged() }, modifier = Modifier.height(32.dp), contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp), colors = ButtonDefaults.buttonColors(containerColor = Purple)) { Text("BID $value", color = Gold, fontSize = 11.sp) } } }
             } else if (humanTurn) Text(if (selectedCard == null) "SELECT A CARD TO PLAY" else "${selectedCard?.label} SELECTED", color = Gold, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-            val step = if (hand.size > 1) ((maxWidth - cardWidth - 24.dp) / (hand.size - 1)).coerceAtMost(cardWidth * .66f) else cardWidth
+            val step = if (hand.size > 1) ((availableWidth - cardWidth - 24.dp) / (hand.size - 1)).coerceAtMost(cardWidth * .66f) else cardWidth
             val overlap = (cardWidth - step).coerceAtLeast(0.dp)
             Row(Modifier.fillMaxWidth().height(cardHeight + 8.dp), horizontalArrangement = Arrangement.spacedBy(-overlap, Alignment.CenterHorizontally), verticalAlignment = Alignment.Bottom) {
                 hand.forEachIndexed { i, card ->
