@@ -1,0 +1,19 @@
+R_DEF: Internal format may change without notice
+local
+drawable cozy_living_room_game_table
+drawable enchanted_table_texture
+drawable jester_card
+drawable jester_card_art
+drawable jester_illustration
+drawable offline_fantasy_background
+drawable portrait_arun
+drawable portrait_nithin
+drawable portrait_rahul
+drawable portrait_vishnu
+drawable walnut_table
+drawable welcome_wizard
+drawable wizard
+drawable wizard_card
+drawable wizard_card_art
+drawable wizard_illustration
+style AppTheme

@@ -1,0 +1,66 @@
+[
+    {
+        "merged": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-debug-46:\\drawable-nodpi_wizard_card_art.png.flat",
+        "source": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-main-48:\\drawable-nodpi\\wizard_card_art.png"
+    },
+    {
+        "merged": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-debug-46:\\drawable-nodpi_offline_fantasy_background.png.flat",
+        "source": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-main-48:\\drawable-nodpi\\offline_fantasy_background.png"
+    },
+    {
+        "merged": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-debug-46:\\drawable-nodpi_wizard_illustration.png.flat",
+        "source": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-main-48:\\drawable-nodpi\\wizard_illustration.png"
+    },
+    {
+        "merged": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-debug-46:\\drawable-nodpi_cozy_living_room_game_table.png.flat",
+        "source": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-main-48:\\drawable-nodpi\\cozy_living_room_game_table.png"
+    },
+    {
+        "merged": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-debug-46:\\drawable-nodpi_portrait_rahul.png.flat",
+        "source": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-main-48:\\drawable-nodpi\\portrait_rahul.png"
+    },
+    {
+        "merged": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-debug-46:\\drawable-nodpi_wizard.png.flat",
+        "source": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-main-48:\\drawable-nodpi\\wizard.png"
+    },
+    {
+        "merged": "com.akshay.wizardgame.app-debug-46:/drawable-nodpi_jester_card.png.flat",
+        "source": "com.akshay.wizardgame.app-main-48:/drawable-nodpi/jester_card.png"
+    },
+    {
+        "merged": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-debug-46:\\drawable-nodpi_welcome_wizard.png.flat",
+        "source": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-main-48:\\drawable-nodpi\\welcome_wizard.png"
+    },
+    {
+        "merged": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-debug-46:\\drawable-nodpi_jester_illustration.png.flat",
+        "source": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-main-48:\\drawable-nodpi\\jester_illustration.png"
+    },
+    {
+        "merged": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-debug-46:\\drawable-nodpi_jester_card_art.png.flat",
+        "source": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-main-48:\\drawable-nodpi\\jester_card_art.png"
+    },
+    {
+        "merged": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-debug-46:\\drawable-nodpi_walnut_table.png.flat",
+        "source": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-main-48:\\drawable-nodpi\\walnut_table.png"
+    },
+    {
+        "merged": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-debug-46:\\drawable-nodpi_wizard_card.png.flat",
+        "source": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-main-48:\\drawable-nodpi\\wizard_card.png"
+    },
+    {
+        "merged": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-debug-46:\\drawable-nodpi_portrait_nithin.png.flat",
+        "source": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-main-48:\\drawable-nodpi\\portrait_nithin.png"
+    },
+    {
+        "merged": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-debug-46:\\drawable-nodpi_portrait_vishnu.png.flat",
+        "source": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-main-48:\\drawable-nodpi\\portrait_vishnu.png"
+    },
+    {
+        "merged": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-debug-46:\\drawable-nodpi_enchanted_table_texture.png.flat",
+        "source": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-main-48:\\drawable-nodpi\\enchanted_table_texture.png"
+    },
+    {
+        "merged": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-debug-46:\\drawable-nodpi_portrait_arun.png.flat",
+        "source": "C:\\Users\\lines\\.gradle\\daemon\\9.6.0\\com.akshay.wizardgame.app-main-48:\\drawable-nodpi\\portrait_arun.png"
+    }
+]
