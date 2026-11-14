@@ -292,9 +292,6 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
         val choosingTrump = state.trumpIsWizard && !state.trumpChosen && state.dealerIndex == userIndex
         Image(painterResource(R.drawable.cozy_living_room_game_table), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
         Box(Modifier.fillMaxSize().background(Color(0x26050A10)))
-        // Subtle warm gold perimeter echoes the reference table rim without replacing the table artwork.
-        Box(Modifier.fillMaxSize().padding(horizontal = 5.dp, vertical = 4.dp)
-            .border(2.dp, Brush.sweepGradient(listOf(Color(0xFFFFB12B), Color(0xFFFFE08A), Color(0xFFB96818), Color(0xFFFFC34D))), RoundedCornerShape(48)))
         Row(Modifier.align(Alignment.TopStart).padding(start = 10.dp, top = 8.dp), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
             StatusPanel("ROUND", "${state.round} / ${state.maxRounds}")
             StatusPanel("CARDS  ·  BIDS", "${state.cardsPerPlayer}     ${state.bidTotal} / ${state.round * playerCount}")
@@ -363,14 +360,15 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
                 }
             }
         }
-        Row(Modifier.align(Alignment.BottomEnd).padding(end = 8.dp, bottom = 66.dp)
-            .shadow(5.dp, RoundedCornerShape(11.dp)).clip(RoundedCornerShape(11.dp))
+        // Compact player details sit immediately to the right of the human hand, vertically centered with the cards.
+        Row(Modifier.align(Alignment.BottomEnd).padding(end = 8.dp, bottom = 92.dp)
+            .shadow(5.dp, RoundedCornerShape(10.dp)).clip(RoundedCornerShape(10.dp))
             .background(Color(0xE8170D08))
-            .border(1.dp, if (humanTurn || bidding && state.bidTurnIndex == userIndex) Color(0xFFFFB52E) else Gold2, RoundedCornerShape(11.dp))
-            .padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            .border(1.dp, if (humanTurn || bidding && state.bidTurnIndex == userIndex) Color(0xFFFFB52E) else Gold2, RoundedCornerShape(10.dp))
+            .padding(horizontal = 7.dp, vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(horizontalAlignment = Alignment.End) {
-                Text(user.name, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
-                Text("Bid: ${user.bid ?: "—"}  |  Won: ${user.tricksWon}", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                Text(user.name, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
+                Text("Bid: ${user.bid ?: "—"}  |  Won: ${user.tricksWon}", color = Color.White, fontSize = 8.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
             }
         }
         // Keep the action controls pinned to the bottom corners, independent of the oversized hand.
