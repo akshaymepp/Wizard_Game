@@ -281,14 +281,18 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
         }
         val availableWidth = maxWidth
         val availableHeight = maxHeight
+        // Size cards from the available landscape viewport and let the hand fan overlap naturally.
         val widthLimited = (availableWidth - 28.dp) / (state.round * .42f).coerceAtLeast(3f) / .64f
-        val cardHeight = minOf(availableHeight * .21f, widthLimited).coerceIn(48.dp, 126.dp)
+        val cardHeight = minOf(availableHeight * .27f, widthLimited).coerceIn(58.dp, 148.dp)
         val cardWidth = cardHeight * .64f
         val hand = state.players[userIndex].hand
         val bidding = !state.bidsLocked
         val choosingTrump = state.trumpIsWizard && !state.trumpChosen && state.dealerIndex == userIndex
         Image(painterResource(R.drawable.cozy_living_room_game_table), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-        Box(Modifier.fillMaxSize().background(Color(0x33050A10)))
+        Box(Modifier.fillMaxSize().background(Color(0x26050A10)))
+        // Subtle warm gold perimeter echoes the reference table rim without replacing the table artwork.
+        Box(Modifier.fillMaxSize().padding(horizontal = 5.dp, vertical = 4.dp)
+            .border(2.dp, Brush.sweepGradient(listOf(Color(0xFFFFB12B), Color(0xFFFFE08A), Color(0xFFB96818), Color(0xFFFFC34D))), RoundedCornerShape(48)))
         Row(Modifier.align(Alignment.TopStart).padding(start = 10.dp, top = 8.dp), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
             StatusPanel("ROUND", "${state.round} / ${state.maxRounds}")
             StatusPanel("CARDS  ·  BIDS", "${state.cardsPerPlayer}     ${state.bidTotal} / ${state.round * playerCount}")
@@ -323,7 +327,8 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
         }
         state.players.forEachIndexed { index, player ->
             if (index == userIndex) return@forEachIndexed
-            val point = seats.getValue(index); val seatWidth = (availableWidth * .205f).coerceIn(112.dp, 178.dp)
+            val point = seats.getValue(index)
+            val seatWidth = (availableWidth * .17f).coerceIn(104.dp, 158.dp)
             GameSeat(player, dealer = state.dealerIndex == index, active = if (bidding) state.bidTurnIndex == index else state.currentPlayerIndex == index, cardCount = player.hand.size,
                 modifier = Modifier.offset(x = availableWidth * point.x - seatWidth / 2f, y = availableHeight * point.y).width(seatWidth))
         }
@@ -334,9 +339,12 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
         }
         val user = state.players[userIndex]
         Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth().fillMaxHeight(.52f).padding(horizontal = 9.dp, vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
-            Row(Modifier.clip(RoundedCornerShape(15.dp)).background(Color(0xD91A1110)).border(1.dp, if (humanTurn || bidding && state.bidTurnIndex == userIndex) Gold else Gold2, RoundedCornerShape(15.dp)).padding(horizontal = 11.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                if (state.dealerIndex == userIndex) Text("♛  ", color = Gold, fontSize = 13.sp)
-                Text("${user.name}  |  ${user.hand.size} CARDS  |  BID ${user.bid ?: "—"}  |  WON ${user.tricksWon}", color = Gold, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            Row(Modifier.clip(RoundedCornerShape(12.dp)).background(Color(0xE8170D08))
+                .border(1.dp, if (humanTurn || bidding && state.bidTurnIndex == userIndex) Color(0xFFFFB52E) else Gold2, RoundedCornerShape(12.dp))
+                .padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(user.name, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
+                Spacer(Modifier.width(9.dp))
+                Text("Bid: ${user.bid ?: "—"}  |  Won: ${user.tricksWon}", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
             }
             if (choosingTrump) {
                 Text("CHOOSE TRUMP", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp)
@@ -349,12 +357,15 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
             } else if (humanTurn) Text(if (selectedCard == null) "SELECT A CARD TO PLAY" else "${selectedCard?.label} SELECTED", color = Gold, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             // Keep the full face of each card visible and distribute the hand evenly
             // across the lower table instead of stacking the cards tightly in the center.
-            val step = if (hand.size > 1) ((availableWidth - cardWidth - 36.dp) / (hand.size - 1)).coerceAtMost(cardWidth + 8.dp) else cardWidth
-            val cardGap = (step - cardWidth).coerceAtLeast(0.dp)
-            Row(Modifier.fillMaxWidth().height(cardHeight + 10.dp), horizontalArrangement = Arrangement.spacedBy(cardGap, Alignment.CenterHorizontally), verticalAlignment = Alignment.Bottom) {
+            val step = if (hand.size > 1) {
+                minOf(cardWidth * .54f, (availableWidth - 34.dp - cardWidth) / (hand.size - 1)).coerceAtLeast(cardWidth * .30f)
+            } else cardWidth
+            val cardGap = step - cardWidth
+            Row(Modifier.fillMaxWidth().height(cardHeight + 12.dp), horizontalArrangement = Arrangement.spacedBy(cardGap, Alignment.CenterHorizontally), verticalAlignment = Alignment.Bottom) {
                 hand.forEachIndexed { i, card ->
                     val canSelect = !bidding && humanTurn && card in legalCards && flight == null; val chosen = selectedHandIndex == i
-                    Box(Modifier.width(cardWidth).height(cardHeight).offset(y = if (chosen) (-8).dp else 0.dp).clickable(enabled = canSelect) {
+                    val fanRotation = ((i - (hand.lastIndex / 2f)) * 1.35f).coerceIn(-8f, 8f)
+                    Box(Modifier.width(cardWidth).height(cardHeight).offset(y = if (chosen) (-10).dp else 0.dp).rotate(if (chosen) 0f else fanRotation).clickable(enabled = canSelect) {
                         if (chosen) { selectedCard = null; selectedHandIndex = -1 } else { selectedCard = card; selectedHandIndex = i }
                     }) {
                         val cardModifier = Modifier.graphicsLayer(alpha = if (canSelect || !humanTurn || bidding) 1f else .62f)
@@ -389,13 +400,13 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
 @Composable
 private fun GameSeat(player: WizardPlayer, dealer: Boolean, active: Boolean, cardCount: Int, modifier: Modifier = Modifier) {
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        if (dealer) Text("♛", color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-        Column(Modifier.fillMaxWidth().shadow(5.dp, RoundedCornerShape(13.dp)).clip(RoundedCornerShape(13.dp)).background(Color(0xD91A1110))
-            .border(if (active) 1.7.dp else 1.dp, if (active) Color(0xFFFFD477) else Color(0xFF9F7951).copy(alpha = .85f), RoundedCornerShape(13.dp))
-            .padding(horizontal = 9.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(player.name, color = if (active) Color(0xFFFFD477) else Color.White, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
+        Column(Modifier.fillMaxWidth().shadow(5.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp))
+            .background(Color(0xE8170D08))
+            .border(if (active) 1.6.dp else 1.dp, if (active) Color(0xFFFFC34D) else Color(0xFFB87925), RoundedCornerShape(12.dp))
+            .padding(horizontal = 5.dp, vertical = 5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(player.name, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
             Spacer(Modifier.height(2.dp))
-            Text("${player.hand.size} cards  ·  Bid ${player.bid ?: "—"}  ·  Won ${player.tricksWon}", color = Color(0xFFE5D6C3), fontSize = 9.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+            Text("Bid: ${player.bid ?: "—"}  |  Won: ${player.tricksWon}", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
         }
         OpponentCardFan(cardCount)
     }
@@ -403,11 +414,11 @@ private fun GameSeat(player: WizardPlayer, dealer: Boolean, active: Boolean, car
 
 @Composable
 private fun OpponentCardFan(cardCount: Int) {
-    val visible = cardCount.coerceAtMost(6)
-    if (visible > 0) Row(Modifier.padding(top = 3.dp), horizontalArrangement = Arrangement.spacedBy((-11).dp), verticalAlignment = Alignment.CenterVertically) {
+    val visible = cardCount.coerceAtMost(4)
+    if (visible > 0) Row(Modifier.padding(top = 3.dp), horizontalArrangement = Arrangement.spacedBy((-13).dp), verticalAlignment = Alignment.CenterVertically) {
         repeat(visible) { index ->
-            val angle = (index - (visible - 1) / 2f) * 6f
-            Box(Modifier.width(26.dp).height(37.dp).rotate(angle).shadow(3.dp, RoundedCornerShape(4.dp)).clip(RoundedCornerShape(4.dp))
+            val angle = (index - (visible - 1) / 2f) * 5f
+            Box(Modifier.width(30.dp).height(43.dp).rotate(angle).shadow(3.dp, RoundedCornerShape(5.dp)).clip(RoundedCornerShape(5.dp))
                 .background(Color(0xFF8F1D2B)).border(1.dp, Color.White, RoundedCornerShape(4.dp)).padding(2.dp), contentAlignment = Alignment.Center) {
                 Box(Modifier.fillMaxSize().border(.7.dp, Color(0xFFEAD9C9), RoundedCornerShape(3.dp)), contentAlignment = Alignment.Center) {
                     Text("✦", color = Color(0xFFF1D8C2), fontSize = 11.sp)
@@ -469,13 +480,23 @@ private fun OfflineRoundResults(state: WizardGameState, summary: RoundSummary, o
 
 private fun playerSeatPoints(players: List<WizardPlayer>, userIndex: Int): Map<Int, SeatPoint> {
     val opponents = players.indices.filter { it != userIndex }
+    // Positions are normalized to the table viewport. The human hand owns the bottom edge.
+    // Every supported total-player count gets a symmetric, non-overlapping opponent arrangement.
     val opponentPoints = when (players.size) {
-        3 -> listOf(SeatPoint(.27f, .20f), SeatPoint(.73f, .20f))
-        4 -> listOf(SeatPoint(.12f, .35f), SeatPoint(.50f, .17f), SeatPoint(.88f, .35f))
-        5 -> listOf(SeatPoint(.15f, .20f), SeatPoint(.85f, .20f), SeatPoint(.85f, .40f), SeatPoint(.15f, .40f))
+        3 -> listOf(
+            SeatPoint(.27f, .18f), SeatPoint(.73f, .18f)
+        )
+        4 -> listOf(
+            SeatPoint(.50f, .10f), SeatPoint(.10f, .34f), SeatPoint(.90f, .34f)
+        )
+        5 -> listOf(
+            SeatPoint(.23f, .17f), SeatPoint(.77f, .17f),
+            SeatPoint(.10f, .39f), SeatPoint(.90f, .39f)
+        )
         else -> listOf(
-            SeatPoint(.13f, .20f), SeatPoint(.50f, .15f), SeatPoint(.87f, .20f),
-            SeatPoint(.83f, .40f), SeatPoint(.17f, .40f)
+            SeatPoint(.50f, .09f),
+            SeatPoint(.23f, .18f), SeatPoint(.77f, .18f),
+            SeatPoint(.10f, .39f), SeatPoint(.90f, .39f)
         )
     }
     return buildMap {
