@@ -235,6 +235,7 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
     val collectProgress = remember(engine) { Animatable(0f) }
     var menuExpanded by remember { mutableStateOf(false) }
     var activeDialog by remember { mutableStateOf<String?>(null) }
+    var selectedBid by remember(engine) { mutableIntStateOf(0) }
     val cardsToDeal = playerCount * state.round
     val dealing = dealtRound != state.round || dealStep < cardsToDeal
     BackHandler(onBack = { activeDialog = "exit" })
@@ -284,7 +285,7 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
         // Size cards from the available landscape viewport and let the hand fan overlap naturally.
         val widthLimited = (availableWidth - 28.dp) / (state.round * .42f).coerceAtLeast(3f) / .64f
         // Give the human hand a larger footprint near the lower table edge.
-        val cardHeight = minOf(availableHeight * .34f, widthLimited).coerceIn(70.dp, 184.dp)
+        val cardHeight = minOf(availableHeight * .43f, widthLimited).coerceIn(82.dp, 224.dp)
         val cardWidth = cardHeight * .64f
         val hand = state.players[userIndex].hand
         val bidding = !state.bidsLocked
@@ -311,12 +312,6 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
                 }
             }
         }
-        if (bidding && state.bidTurnIndex == userIndex) {
-            Box(Modifier.align(Alignment.CenterStart).padding(start = 10.dp).clip(RoundedCornerShape(22.dp))
-                .background(Purple).border(1.dp, Gold2, RoundedCornerShape(22.dp)).padding(horizontal = 16.dp, vertical = 8.dp)) {
-                Text("BID 0", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-            }
-        }
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             state.trick.forEachIndexed { trickIndex, played ->
                 val seat = seats.getValue(played.playerIndex); val collect = collectProgress.value
@@ -339,7 +334,7 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
                 .size(26.dp, 38.dp).clip(RoundedCornerShape(5.dp)).background(Color(0xFF8F1D2B)).border(1.dp, Color.White, RoundedCornerShape(5.dp)), contentAlignment = Alignment.Center) { Text("✦", color = Gold, fontSize = 13.sp) }
         }
         val user = state.players[userIndex]
-        Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth().fillMaxHeight(.60f).padding(start = 7.dp, end = 7.dp, top = 2.dp, bottom = 1.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
+        Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth(.96f).fillMaxHeight(.54f).padding(start = 2.dp, end = 2.dp, top = 2.dp, bottom = 0.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
             Row(Modifier.clip(RoundedCornerShape(12.dp)).background(Color(0xE8170D08))
                 .border(1.dp, if (humanTurn || bidding && state.bidTurnIndex == userIndex) Color(0xFFFFB52E) else Gold2, RoundedCornerShape(12.dp))
                 .padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -353,16 +348,14 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
                     Suit.values().forEach { s -> Button(onClick = { engine.chooseTrump(s); onChanged() }, contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp), modifier = Modifier.height(34.dp), colors = ButtonDefaults.buttonColors(containerColor = suitColor(s))) { Text(suitName(s), fontSize = 10.sp) } }
                     TextButton(onClick = { engine.chooseTrump(null); onChanged() }) { Text("NO TRUMP", color = Gold, fontSize = 10.sp) }
                 }
-            } else if (bidding && state.bidTurnIndex == userIndex) {
-                LazyRow(Modifier.fillMaxWidth().height(36.dp), horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) { items(engine.legalBidsFor(userIndex)) { value -> Button(onClick = { engine.submitBid(userIndex, value); selectedCard = null; selectedHandIndex = -1; onChanged() }, modifier = Modifier.height(32.dp), contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp), colors = ButtonDefaults.buttonColors(containerColor = Purple)) { Text("BID $value", color = Gold, fontSize = 11.sp) } } }
             } else if (humanTurn) Text(if (selectedCard == null) "SELECT A CARD TO PLAY" else "${selectedCard?.label} SELECTED", color = Gold, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             // Keep the full face of each card visible and distribute the hand evenly
             // across the lower table instead of stacking the cards tightly in the center.
             val step = if (hand.size > 1) {
-                minOf(cardWidth * .54f, (availableWidth - 34.dp - cardWidth) / (hand.size - 1)).coerceAtLeast(cardWidth * .30f)
+                minOf(cardWidth * .43f, (availableWidth - 24.dp - cardWidth) / (hand.size - 1)).coerceAtLeast(cardWidth * .27f)
             } else cardWidth
             val cardGap = step - cardWidth
-            Row(Modifier.fillMaxWidth().height(cardHeight + 12.dp), horizontalArrangement = Arrangement.spacedBy(cardGap, Alignment.CenterHorizontally), verticalAlignment = Alignment.Bottom) {
+            Row(Modifier.fillMaxWidth().height(cardHeight + 30.dp).offset(y = 24.dp), horizontalArrangement = Arrangement.spacedBy(cardGap, Alignment.CenterHorizontally), verticalAlignment = Alignment.Bottom) {
                 hand.forEachIndexed { i, card ->
                     val canSelect = !bidding && humanTurn && card in legalCards && flight == null; val chosen = selectedHandIndex == i
                     val fanRotation = ((i - (hand.lastIndex / 2f)) * 1.35f).coerceIn(-8f, 8f)
@@ -376,10 +369,19 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
                     }
                 }
             }
-            Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                OutlinedButton(onClick = { activeDialog = "settings" }, contentPadding = PaddingValues(horizontal = 16.dp, vertical = 5.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Gold2)) { Text("EDIT", fontSize = 11.sp) }
-                Button(onClick = { selectedCard?.let { flight = CardFlight(userIndex, it) } }, enabled = humanTurn && selectedCard != null && selectedCard in legalCards && flight == null, contentPadding = PaddingValues(horizontal = 22.dp, vertical = 7.dp), shape = RoundedCornerShape(24.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF237A4B), disabledContainerColor = Color(0xFF343C36)), border = androidx.compose.foundation.BorderStroke(1.5.dp, if (humanTurn && selectedCard in legalCards) Color(0xFF83E0A8) else Gold2)) { Text("PLAY", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp) }
-            }
+        }
+        // Keep the action controls pinned to the bottom corners, independent of the oversized hand.
+        OutlinedButton(onClick = { activeDialog = "settings" }, modifier = Modifier.align(Alignment.BottomStart).padding(start = 8.dp, bottom = 7.dp),
+            contentPadding = PaddingValues(horizontal = 15.dp, vertical = 6.dp), border = androidx.compose.foundation.BorderStroke(1.5.dp, Gold2)) {
+            Text("✎ EDIT", fontSize = 12.sp, color = Gold, fontWeight = FontWeight.Bold)
+        }
+        Button(onClick = { selectedCard?.let { flight = CardFlight(userIndex, it) } },
+            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 8.dp, bottom = 7.dp),
+            enabled = humanTurn && selectedCard != null && selectedCard in legalCards && flight == null,
+            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp), shape = RoundedCornerShape(24.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF237A4B), disabledContainerColor = Color(0xFF343C36)),
+            border = androidx.compose.foundation.BorderStroke(1.5.dp, if (humanTurn && selectedCard in legalCards) Color(0xFF83E0A8) else Gold2)) {
+            Text("▶ PLAY", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
         }
         flight?.let { active ->
             val start = seats[active.playerIndex] ?: SeatPoint(.5f, .88f); val p = flightProgress.value
@@ -387,6 +389,47 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
             Box(Modifier.offset(x = availableWidth * x - cardWidth / 2f, y = availableHeight * y - cardHeight / 2f).zIndex(25f)) {
                 val c = active.card
                 PlayingCard(c.label, c.suit?.let(::suitMark) ?: if (c.kind == Kind.WIZARD) "W" else "J", c.suit?.let(::suitColor) ?: Gold, c.kind != Kind.NUMBER, cardWidth = cardWidth * .72f, cardHeight = cardHeight * .72f)
+            }
+        }
+        if (bidding && state.bidTurnIndex == userIndex && !dealing) {
+            val legalBids = engine.legalBidsFor(userIndex)
+            LaunchedEffect(state.round, state.bidTurnIndex, legalBids) {
+                if (selectedBid !in legalBids) selectedBid = legalBids.firstOrNull() ?: 0
+            }
+            Dialog(onDismissRequest = { /* bidding must be completed before play can continue */ }, properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
+                Column(Modifier.fillMaxWidth(.78f).widthIn(max = 430.dp)
+                    .shadow(18.dp, RoundedCornerShape(24.dp)).clip(RoundedCornerShape(24.dp))
+                    .background(Brush.verticalGradient(listOf(Color(0xFF2A160D), Color(0xFF100B09))))
+                    .border(2.dp, Gold, RoundedCornerShape(24.dp)).padding(horizontal = 22.dp, vertical = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("PLACE YOUR BID", color = Gold, fontSize = 23.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Serif)
+                    Spacer(Modifier.height(7.dp))
+                    Text("Round ${state.round}  •  ${state.cardsPerPlayer} cards in your hand", color = Color.White, fontSize = 13.sp)
+                    Spacer(Modifier.height(18.dp))
+                    Text("SELECT YOUR BID", color = Color(0xFFFFDFA0), fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
+                    Spacer(Modifier.height(10.dp))
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(7.dp, Alignment.CenterHorizontally)) {
+                        legalBids.forEach { value ->
+                            val chosen = selectedBid == value
+                            Box(Modifier.weight(1f).height(48.dp).clip(RoundedCornerShape(12.dp))
+                                .background(if (chosen) Brush.verticalGradient(listOf(Color(0xFF8A42C5), Color(0xFF42116F))) else Brush.verticalGradient(listOf(Color(0xFF34251B), Color(0xFF19110D))))
+                                .border(if (chosen) 2.dp else 1.dp, if (chosen) Gold else Gold2, RoundedCornerShape(12.dp))
+                                .clickable { selectedBid = value }, contentAlignment = Alignment.Center) {
+                                Text("$value", color = if (chosen) Color.White else Color(0xFFE9D9C5), fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(18.dp))
+                    Button(onClick = {
+                        engine.submitBid(userIndex, selectedBid)
+                        selectedCard = null; selectedHandIndex = -1
+                        onChanged()
+                    }, modifier = Modifier.fillMaxWidth().height(50.dp), shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Purple),
+                        border = androidx.compose.foundation.BorderStroke(1.5.dp, Gold)) {
+                        Text("CONFIRM BID  •  $selectedBid", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
             }
         }
         if (activeDialog != null) {
