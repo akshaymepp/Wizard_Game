@@ -283,7 +283,8 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
         val availableHeight = maxHeight
         // Size cards from the available landscape viewport and let the hand fan overlap naturally.
         val widthLimited = (availableWidth - 28.dp) / (state.round * .42f).coerceAtLeast(3f) / .64f
-        val cardHeight = minOf(availableHeight * .27f, widthLimited).coerceIn(58.dp, 148.dp)
+        // Give the human hand a larger footprint near the lower table edge.
+        val cardHeight = minOf(availableHeight * .34f, widthLimited).coerceIn(70.dp, 184.dp)
         val cardWidth = cardHeight * .64f
         val hand = state.players[userIndex].hand
         val bidding = !state.bidsLocked
@@ -338,7 +339,7 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
                 .size(26.dp, 38.dp).clip(RoundedCornerShape(5.dp)).background(Color(0xFF8F1D2B)).border(1.dp, Color.White, RoundedCornerShape(5.dp)), contentAlignment = Alignment.Center) { Text("✦", color = Gold, fontSize = 13.sp) }
         }
         val user = state.players[userIndex]
-        Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth().fillMaxHeight(.52f).padding(horizontal = 9.dp, vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
+        Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth().fillMaxHeight(.60f).padding(start = 7.dp, end = 7.dp, top = 2.dp, bottom = 1.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
             Row(Modifier.clip(RoundedCornerShape(12.dp)).background(Color(0xE8170D08))
                 .border(1.dp, if (humanTurn || bidding && state.bidTurnIndex == userIndex) Color(0xFFFFB52E) else Gold2, RoundedCornerShape(12.dp))
                 .padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -484,19 +485,19 @@ private fun playerSeatPoints(players: List<WizardPlayer>, userIndex: Int): Map<I
     // Every supported total-player count gets a symmetric, non-overlapping opponent arrangement.
     val opponentPoints = when (players.size) {
         3 -> listOf(
-            SeatPoint(.27f, .18f), SeatPoint(.73f, .18f)
+            SeatPoint(.14f, .11f), SeatPoint(.86f, .11f)
         )
         4 -> listOf(
-            SeatPoint(.50f, .10f), SeatPoint(.10f, .34f), SeatPoint(.90f, .34f)
+            SeatPoint(.50f, .055f), SeatPoint(.075f, .29f), SeatPoint(.925f, .29f)
         )
         5 -> listOf(
-            SeatPoint(.23f, .17f), SeatPoint(.77f, .17f),
-            SeatPoint(.10f, .39f), SeatPoint(.90f, .39f)
+            SeatPoint(.20f, .075f), SeatPoint(.80f, .075f),
+            SeatPoint(.055f, .32f), SeatPoint(.945f, .32f)
         )
         else -> listOf(
-            SeatPoint(.50f, .09f),
-            SeatPoint(.23f, .18f), SeatPoint(.77f, .18f),
-            SeatPoint(.10f, .39f), SeatPoint(.90f, .39f)
+            SeatPoint(.50f, .045f),
+            SeatPoint(.20f, .075f), SeatPoint(.80f, .075f),
+            SeatPoint(.055f, .32f), SeatPoint(.945f, .32f)
         )
     }
     return buildMap {
