@@ -306,6 +306,12 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
                 }
             }
         }
+        if (bidding && state.bidTurnIndex == userIndex) {
+            Box(Modifier.align(Alignment.CenterStart).padding(start = 10.dp).clip(RoundedCornerShape(22.dp))
+                .background(Purple).border(1.dp, Gold2, RoundedCornerShape(22.dp)).padding(horizontal = 16.dp, vertical = 8.dp)) {
+                Text("BID 0", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            }
+        }
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             state.trick.forEachIndexed { trickIndex, played ->
                 val seat = seats.getValue(played.playerIndex); val collect = collectProgress.value
@@ -415,8 +421,8 @@ private fun OpponentCardFan(cardCount: Int) {
 private fun StatusPanel(label: String, value: String, valueColor: Color = Color.White) {
     Column(Modifier.clip(RoundedCornerShape(11.dp)).background(Color(0xD9120E0D))
         .border(1.dp, Gold2.copy(alpha = .8f), RoundedCornerShape(11.dp)).padding(horizontal = 10.dp, vertical = 5.dp)) {
-        Text(label, color = Color(0xFFD3C5B3), fontSize = 8.sp, fontWeight = FontWeight.Bold, letterSpacing = .5.sp)
-        Text(value, color = valueColor, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+        Text(label, color = Color(0xFFD3C5B3), fontSize = if (label == "TRUMP") 9.sp else 8.sp, fontWeight = FontWeight.Bold, letterSpacing = .5.sp)
+        Text(value, color = valueColor, fontSize = if (label == "TRUMP") 17.sp else 12.sp, fontWeight = FontWeight.Bold, maxLines = 1)
     }
 }
 @Composable
