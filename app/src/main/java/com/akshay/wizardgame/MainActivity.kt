@@ -341,13 +341,14 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
             } else if (bidding && state.bidTurnIndex == userIndex) {
                 LazyRow(Modifier.fillMaxWidth().height(36.dp), horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) { items(engine.legalBidsFor(userIndex)) { value -> Button(onClick = { engine.submitBid(userIndex, value); selectedCard = null; selectedHandIndex = -1; onChanged() }, modifier = Modifier.height(32.dp), contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp), colors = ButtonDefaults.buttonColors(containerColor = Purple)) { Text("BID $value", color = Gold, fontSize = 11.sp) } } }
             } else if (humanTurn) Text(if (selectedCard == null) "SELECT A CARD TO PLAY" else "${selectedCard?.label} SELECTED", color = Gold, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-            val step = if (hand.size > 1) ((availableWidth - cardWidth - 24.dp) / (hand.size - 1)).coerceAtMost(cardWidth * .66f) else cardWidth
-            val overlap = (cardWidth - step).coerceAtLeast(0.dp)
-            Row(Modifier.fillMaxWidth().height(cardHeight + 8.dp), horizontalArrangement = Arrangement.spacedBy(-overlap, Alignment.CenterHorizontally), verticalAlignment = Alignment.Bottom) {
+            // Keep the full face of each card visible and distribute the hand evenly
+            // across the lower table instead of stacking the cards tightly in the center.
+            val step = if (hand.size > 1) ((availableWidth - cardWidth - 36.dp) / (hand.size - 1)).coerceAtMost(cardWidth + 8.dp) else cardWidth
+            val cardGap = (step - cardWidth).coerceAtLeast(0.dp)
+            Row(Modifier.fillMaxWidth().height(cardHeight + 10.dp), horizontalArrangement = Arrangement.spacedBy(cardGap, Alignment.CenterHorizontally), verticalAlignment = Alignment.Bottom) {
                 hand.forEachIndexed { i, card ->
                     val canSelect = !bidding && humanTurn && card in legalCards && flight == null; val chosen = selectedHandIndex == i
-                    val rotation = if (hand.size <= 1) 0f else ((i - hand.lastIndex / 2f) * 2.2f).coerceIn(-9f, 9f)
-                    Box(Modifier.width(cardWidth).height(cardHeight).offset(y = if (chosen) (-8).dp else 0.dp).rotate(if (chosen) 0f else rotation).clickable(enabled = canSelect) {
+                    Box(Modifier.width(cardWidth).height(cardHeight).offset(y = if (chosen) (-8).dp else 0.dp).clickable(enabled = canSelect) {
                         if (chosen) { selectedCard = null; selectedHandIndex = -1 } else { selectedCard = card; selectedHandIndex = i }
                     }) {
                         val cardModifier = Modifier.graphicsLayer(alpha = if (canSelect || !humanTurn || bidding) 1f else .62f)
@@ -385,9 +386,10 @@ private fun GameSeat(player: WizardPlayer, dealer: Boolean, active: Boolean, car
         if (dealer) Text("♛", color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
         Column(Modifier.fillMaxWidth().shadow(5.dp, RoundedCornerShape(13.dp)).clip(RoundedCornerShape(13.dp)).background(Color(0xD91A1110))
             .border(if (active) 1.7.dp else 1.dp, if (active) Color(0xFFFFD477) else Color(0xFF9F7951).copy(alpha = .85f), RoundedCornerShape(13.dp))
-            .padding(horizontal = 7.dp, vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(player.name, color = if (active) Color(0xFFFFD477) else Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-            Text("${player.hand.size} cards  ·  Bid ${player.bid ?: "—"}  ·  Won ${player.tricksWon}", color = Color(0xFFE5D6C3), fontSize = 8.sp, maxLines = 1)
+            .padding(horizontal = 9.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(player.name, color = if (active) Color(0xFFFFD477) else Color.White, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
+            Spacer(Modifier.height(2.dp))
+            Text("${player.hand.size} cards  ·  Bid ${player.bid ?: "—"}  ·  Won ${player.tricksWon}", color = Color(0xFFE5D6C3), fontSize = 9.sp, fontWeight = FontWeight.Medium, maxLines = 1)
         }
         OpponentCardFan(cardCount)
     }
