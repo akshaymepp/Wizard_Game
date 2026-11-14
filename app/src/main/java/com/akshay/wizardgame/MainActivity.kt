@@ -312,13 +312,13 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
                 }
             }
         }
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            state.trick.forEachIndexed { trickIndex, played ->
-                val seat = seats.getValue(played.playerIndex); val collect = collectProgress.value
-                val ox = availableWidth * (seat.x - .5f) * .46f * (1f + collect * 1.5f)
-                val oy = availableHeight * (seat.y - .5f) * .29f * (1f + collect * 1.5f)
+        Row(Modifier.align(Alignment.Center).zIndex(8f), horizontalArrangement = Arrangement.spacedBy((-cardWidth * .30f), Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically) {
+            state.trick.forEach { played ->
+                val collect = collectProgress.value
                 val c = played.card
-                Box(Modifier.offset(x = ox, y = oy).zIndex(trickIndex.toFloat() + 1f)) { PlayingCard(c.label, c.suit?.let(::suitMark) ?: if (c.kind == Kind.WIZARD) "W" else "J", c.suit?.let(::suitColor) ?: Gold, c.kind != Kind.NUMBER, Modifier.graphicsLayer(alpha = 1f - collect), cardWidth = cardWidth * .68f, cardHeight = cardHeight * .68f) }
+                PlayingCard(c.label, c.suit?.let(::suitMark) ?: if (c.kind == Kind.WIZARD) "W" else "J",
+                    c.suit?.let(::suitColor) ?: Gold, c.kind != Kind.NUMBER,
+                    Modifier.graphicsLayer(alpha = 1f - collect), cardWidth = cardWidth * .46f, cardHeight = cardHeight * .46f)
             }
         }
         state.players.forEachIndexed { index, player ->
@@ -335,13 +335,6 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
         }
         val user = state.players[userIndex]
         Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth(.96f).fillMaxHeight(.54f).padding(start = 2.dp, end = 2.dp, top = 2.dp, bottom = 0.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
-            Row(Modifier.clip(RoundedCornerShape(12.dp)).background(Color(0xE8170D08))
-                .border(1.dp, if (humanTurn || bidding && state.bidTurnIndex == userIndex) Color(0xFFFFB52E) else Gold2, RoundedCornerShape(12.dp))
-                .padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(user.name, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
-                Spacer(Modifier.width(9.dp))
-                Text("Bid: ${user.bid ?: "—"}  |  Won: ${user.tricksWon}", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
-            }
             if (choosingTrump) {
                 Text("CHOOSE TRUMP", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
@@ -368,6 +361,16 @@ private fun OfflineGameScreen(engine: WizardEngine, revision: Int, onChanged: ()
                         if (chosen) Box(Modifier.fillMaxSize().border(2.dp, Gold, RoundedCornerShape(9.dp)))
                     }
                 }
+            }
+        }
+        Row(Modifier.align(Alignment.BottomEnd).padding(end = 8.dp, bottom = 66.dp)
+            .shadow(5.dp, RoundedCornerShape(11.dp)).clip(RoundedCornerShape(11.dp))
+            .background(Color(0xE8170D08))
+            .border(1.dp, if (humanTurn || bidding && state.bidTurnIndex == userIndex) Color(0xFFFFB52E) else Gold2, RoundedCornerShape(11.dp))
+            .padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(horizontalAlignment = Alignment.End) {
+                Text(user.name, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
+                Text("Bid: ${user.bid ?: "—"}  |  Won: ${user.tricksWon}", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
             }
         }
         // Keep the action controls pinned to the bottom corners, independent of the oversized hand.
@@ -527,21 +530,10 @@ private fun playerSeatPoints(players: List<WizardPlayer>, userIndex: Int): Map<I
     // Positions are normalized to the table viewport. The human hand owns the bottom edge.
     // Every supported total-player count gets a symmetric, non-overlapping opponent arrangement.
     val opponentPoints = when (players.size) {
-        3 -> listOf(
-            SeatPoint(.14f, .11f), SeatPoint(.86f, .11f)
-        )
-        4 -> listOf(
-            SeatPoint(.50f, .055f), SeatPoint(.075f, .29f), SeatPoint(.925f, .29f)
-        )
-        5 -> listOf(
-            SeatPoint(.20f, .075f), SeatPoint(.80f, .075f),
-            SeatPoint(.055f, .32f), SeatPoint(.945f, .32f)
-        )
-        else -> listOf(
-            SeatPoint(.50f, .045f),
-            SeatPoint(.20f, .075f), SeatPoint(.80f, .075f),
-            SeatPoint(.055f, .32f), SeatPoint(.945f, .32f)
-        )
+        3 -> listOf(SeatPoint(.25f, .13f), SeatPoint(.75f, .13f))
+        4 -> listOf(SeatPoint(.50f, .12f), SeatPoint(.12f, .34f), SeatPoint(.88f, .34f))
+        5 -> listOf(SeatPoint(.24f, .12f), SeatPoint(.76f, .12f), SeatPoint(.12f, .36f), SeatPoint(.88f, .36f))
+        else -> listOf(SeatPoint(.50f, .12f), SeatPoint(.24f, .13f), SeatPoint(.76f, .13f), SeatPoint(.12f, .36f), SeatPoint(.88f, .36f))
     }
     return buildMap {
         put(userIndex, SeatPoint(.50f, .88f))
